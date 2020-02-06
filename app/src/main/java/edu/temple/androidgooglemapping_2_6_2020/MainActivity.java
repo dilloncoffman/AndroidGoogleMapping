@@ -18,6 +18,11 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -29,6 +34,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     // 2. Implement OnMapReadyCallback interface
     GoogleMap map;
+    // 3. Every time you drop a marker, hold on to it
+    Marker marker;
+    // 4. Map of Markers to set on the map from some data source loading in coordinates
+    Map<String, Marker> myMarkers = new HashMap<String, Marker>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,7 +51,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mapView.getMapAsync(this); // makes async request to get GoogleMap object to use
 
         if (checkCallingOrSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[] {Manifest.permission.ACCESS_FINE_LOCATION}, 123);
+            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 123);
         }
 
         locationListener = new LocationListener() {
@@ -53,6 +62,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 15);
                 if (map != null) {
                     map.animateCamera(cameraUpdate);
+                    // Put user marker down - addMarker returns a Marker you can hold on to
+                    if (marker == null) {
+                        marker = map.addMarker(new MarkerOptions()
+                                .position(latLng)
+                                .title("My Current Location") // all setter methods don't have 'set' in their names with Google Maps Android SDK
+                        );
+                        myMarkers.put(latLng.toString(), marker);
+                    } else
+                        marker.setPosition(latLng);
                 }
             }
 
