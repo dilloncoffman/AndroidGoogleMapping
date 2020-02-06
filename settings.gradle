@@ -1,0 +1,2 @@
+include ':app'
+rootProject.name='AndroidGoogleMapping_2_6_2020'
